@@ -1,5 +1,5 @@
 from django.db import models
-from ed_project.api.validators import range_validate, friendliness_text_validate
+from api.validators import range_validate, friendliness_text_validate
 from django.db.models import Manager
 
 

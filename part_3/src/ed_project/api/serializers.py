@@ -1,4 +1,4 @@
-from ed_project.api.models import *
+from api.models import *
 from rest_framework import serializers
 
 

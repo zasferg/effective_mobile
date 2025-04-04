@@ -1,6 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.mixins import ListModelMixin
-from ed_project.api.serializers import (
+from api.serializers import (
     BreedSerializer,
     BreedSerializerExtended,
     DogSerializer,

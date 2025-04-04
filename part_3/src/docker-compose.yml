@@ -10,21 +10,22 @@ services:
       - "5434:5432"
 
     restart: always
-#     networks:
-#       - custom
-  
-#   web:
-#     build: .
-#     ports:
-#       -"8000:8000"
-#     depends_on:
-#       - django_test_db
-#     networks:
-#       - custom
+    networks:
+       - custom
 
-# networks:
-#   custom:
-#     - "bridge"
+  web:
+     build: .
+     ports:
+        - "8000:8000"
+     depends_on:
+       - django_test_db
+     networks:
+       - custom
+
+networks:
+   custom:
+     driver: bridge
+
 
 
 
