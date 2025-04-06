@@ -12,4 +12,5 @@ COPY . /src/
 
 EXPOSE 8000
 
-CMD ["python", "/src/ed_project/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python /src/ed_project/manage.py makemigrations && python /src/ed_project/manage.py migrate && python /src/ed_project/manage.py runserver 0.0.0.0:8000"]
+
