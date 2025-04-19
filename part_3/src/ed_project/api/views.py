@@ -7,53 +7,55 @@ from api.serializers import (
 )
 from api.models import Breed, Dog
 from rest_framework.response import Response
-from django.db.models import Avg, OuterRef, Subquery, Count
 from rest_framework import status
-
+from api.services import get_breed_data, get_dog_data, get_dog_detail
 
 class BreedViewSet(ModelViewSet):
+    """
+    ViewSet для управления данными о породах собак.
+    """
 
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
 
     def list(self, request):
+        """
+        Получает список всех пород собак с количеством собак каждой породы.
+
+        Args:
+            request (Request): HTTP запрос.
+
+        Returns:
+            Response: HTTP ответ с данными о породах собак.
+        """
         try:
-            dog_count = (
-                Dog.objects.filter(breed_id=OuterRef("id"))
-                .values("breed_id")
-                .annotate(count=Count("breed_id"))
-                .values("count")
-            )
-            breed_query = Breed.objects.annotate(
-                count_of_dogs=Subquery(dog_count)
-            ).values()
+            breed_query = get_breed_data()
             serializer = BreedSerializerExtended(breed_query, many=True)
-
             return Response(serializer.data)
-
         except Exception as e:
             return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class DogViewSet(ModelViewSet):
+    """
+    ViewSet для управления данными о собаках.
+    """
 
     queryset = Dog.objects.all()
     serializer_class = DogSerializer
 
     def list(self, request):
+        """
+        Получает список всех собак и средний возраст собак каждой породы.
 
+        Args:
+            request (Request): HTTP запрос.
+
+        Returns:
+            Response: HTTP ответ с данными о собаках и среднем возрасте собак каждой породы.
+        """
         try:
-            queryset = self.get_queryset()
+            queryset, dogs_breed_name_and_age = get_dog_data()
             dog_serialized_data = self.get_serializer(queryset, many=True)
-
-            breed_name_subquery = Breed.objects.filter(id=OuterRef("breed_id")).values(
-                "name"
-            )
-            dogs_breed_name_and_age = (
-                Dog.objects.annotate(breed_name=Subquery(breed_name_subquery))
-                .values("breed_name")
-                .annotate(average_age=Avg("age"))
-            )
             average_serializer = AvgDataSerializer(dogs_breed_name_and_age, many=True)
 
             response = {
@@ -66,12 +68,19 @@ class DogViewSet(ModelViewSet):
             return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
+        """
+        Получает данные о конкретной собаке и количество собак той же породы.
 
+        Args:
+            request (Request): HTTP запрос.
+            pk (int): Первичный ключ (ID) собаки.
+
+        Returns:
+            Response: HTTP ответ с данными о конкретной собаке и количестве собак той же породы.
+        """
         try:
-
-            dog = Dog.objects.get(pk=pk)
+            dog, breed_count = get_dog_detail(pk)
             dog_serialized_data = self.get_serializer(dog)
-            breed_count = Dog.objects.filter(breed_id=dog.breed_id).count()
 
             response = {
                 "dog_data": dog_serialized_data.data,
@@ -79,6 +88,5 @@ class DogViewSet(ModelViewSet):
             }
 
             return Response(response)
-
         except Exception as e:
             return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
