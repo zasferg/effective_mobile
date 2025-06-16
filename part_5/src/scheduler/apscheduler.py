@@ -1,5 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from cache.cache import redis_connection
+from src.cache.cache import redis_connection
 from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 
