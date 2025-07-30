@@ -7,7 +7,17 @@ services:
       - "8000:8000"
     depends_on:
       - redis-cache
+      - test_db
   redis-cache:
     image: redis:latest
     ports: 
       - "6380:6379"
+  test_db:
+    image: postgres:latest
+    ports:
+      - "6432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_pass
+      - POSTGRES_DB=test_db

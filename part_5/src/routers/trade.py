@@ -24,6 +24,7 @@ async def get_all(session: AsyncSession = Depends(get_session),
             serializable_data = jsonable_encoder(res)
 
             await redis_cache.set("all_trades",json.dumps(serializable_data))
+            return res
         res_cache = await redis_cache.get("all_trades")
         return json.loads(res_cache)
     
@@ -54,7 +55,8 @@ async def get_last_trading_days(days_delta: int,
         
             serializable_data = jsonable_encoder(trading_days_result)
             await redis_cache.set(key,json.dumps(serializable_data))
-            
+            return trading_days_result
+        
         res_cache = await redis_cache.get(key)
         return json.loads(res_cache)
     
@@ -95,7 +97,8 @@ async def get_dynamics(start_date: date = Query(description='Дата должн
             
             serializable_data = jsonable_encoder(dynamics_result)
             await redis_cache.set(key,json.dumps(serializable_data))
-            
+            return dynamics_result
+        
         res_cache = await redis_cache.get(key)
         return json.loads(res_cache)
     
@@ -132,6 +135,7 @@ async def get_trading_results(
 
             serializable_data = jsonable_encoder(trading_results)
             await redis_cache.set(key,json.dumps(serializable_data))
+            return trading_results
             
         res_cache = await redis_cache.get(key)
         return json.loads(res_cache)
